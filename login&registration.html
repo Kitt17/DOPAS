@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DOPAS</title>
+    <link rel="stylesheet" href="login&registration.css">
+</head>
+<body>
+
+<div class="container" id="container">
+
+    <!-- REGISTER FORM -->
+    <div class="form-container register-container">
+        <form id="registerForm">
+            <h2>Create Account</h2>
+            <p class="subtitle">Register to access DOPAS</p>
+
+            <input type="text" name="fullName" placeholder="Full Name" required>
+            <input type="text" name="Address" placeholder="Address" required>
+            <input type="number" name="Postcode" placeholder="Postcode" required>
+            <input type="email" name="Email" placeholder="Email" required>
+            <input type="password" id="regPassword" name="Password" placeholder="Password" required>
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+            <label class="show-password">
+                <input type="checkbox" id="showRegisterPassword">
+                Show Password
+            </label>
+            <button class="btn">Register</button>
+        </form>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="form-container login-container">
+        <form id="loginForm">
+            <h2>DOPAS Login</h2>
+            <p class="subtitle">Dengue Outbreak Prediction & Alert System</p>
+
+            <input type="email" name="Email" placeholder="Email" required>
+            <input type="password" id="loginPassword" name="Password" placeholder="Password" required>
+
+            <label class="show-password">
+                <input type="checkbox" id="showLoginPassword">
+                Show Password
+            </label>
+            <button class="btn">Login</button>
+        </form>
+    </div>
+
+    <!-- SLIDING OVERLAY -->
+    <div class="overlay-container">
+        <div class="overlay">
+            <div class="overlay-panel overlay-left">
+                <h2>Welcome Back!</h2>
+                <p>To keep connected, please login</p>
+                <button class="ghost" id="signInBtn">Sign In</button>
+            </div>
+
+            <div class="overlay-panel overlay-right">
+                <!-- You can replace background with front.png -->
+                <h2>Hello, Friend!</h2>
+                <p>Enter your details and start your journey</p>
+                <button class="ghost" id="signUpBtn">Sign Up</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="login&registration.js"></script>
+<script src="login.js"></script>
+<script src="registration.js"></script>
+</body>
+</html>

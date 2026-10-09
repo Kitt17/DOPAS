@@ -1,0 +1,180 @@
+/* ===== FORM PAGE WRAPPER ===== */
+.form-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 40px;
+}
+
+/* ===== FORM CARD ===== */
+.form-container {
+    background-color: #ebf0f4;
+    width: 150%;
+    max-width: 700px;
+    padding: 40px;
+    border-radius: 15px;
+    border: 2px solid #141b79;
+    box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+    border-top: 6px solid #24124c;
+}
+
+/* ===== HEADINGS ===== */
+.form-container h2 {
+    text-align: center;
+    color: #17124c;
+    margin-bottom: 30px;
+    font-size: 24px;
+    letter-spacing: 1px;
+}
+
+/* ===== FORM SUB-SECTION HEADING ===== */
+.form-container h3 {
+    margin-bottom: 15px;
+    margin-top: 10px;
+    color: #17124c;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+
+/* ===== OPTION BOX ===== */
+.option-box {
+    background: #f9f9f9;
+    border: 2px dashed #292467;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    transition: 0.2s;
+}
+
+.option-box:hover {
+    border-color: #2B124C;
+    background: #f0f0f5;
+}
+
+/* ===== LABELS ===== */
+.form-container label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #141228;
+}
+
+/* ===== INPUTS ===== */
+.form-container input[type="number"],
+.form-container input[type="file"],
+.form-container input[type="text"],
+.form-container input[type="password"],
+.form-container input[type="email"],
+.form-container select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #292467;
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+/* Focus */
+.form-container input:focus,
+.form-container select:focus {
+    outline: none;
+    border-color: #7163af;
+    box-shadow: 0 0 0 3px rgba(133, 79, 108, 0.15);
+}
+
+/* ===== SUBMIT BUTTON ===== */
+.form-container button {
+    margin-top: 30px;
+    width: 100%;
+    padding: 14px;
+    background-color: #180a4c;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.form-container button:hover {
+    background-color: #3d357f;
+}
+
+/* ===== SEARCH PAGE EXTENSIONS ===== */
+
+.form-error {
+    color: #e74c3c;
+    margin-top: 15px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.form-divider {
+    margin: 25px 0;
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+.form-result {
+    font-size: 18px;
+    color: #141228;
+    margin: 8px 0;
+}
+
+/* ===== UNIQUE SEARCH PAGE STYLES ===== */
+
+/* 1. Lengthen the card width and make it transparent */
+.form-container.search-card-custom {
+    max-width: 1000px; 
+    background-color: rgba(235, 240, 244, 0.85); 
+    backdrop-filter: blur(5px); 
+}
+
+.search-flex-box {
+    display: flex;
+    gap: 10px; 
+    align-items: center;
+}
+
+.search-flex-box input[type="text"] {
+    flex: 1; 
+    margin-top: 0;
+}
+
+.search-flex-box button {
+    width: auto; 
+    margin-top: 0; 
+    padding: 12px 30px;
+    white-space: nowrap; 
+}
+
+.form-container.profile-wide {
+    max-width: 1000px; 
+    width: 90%;
+}
+
+.profile-flex-wrapper {
+    display: flex;
+    gap: 40px; 
+    align-items: flex-start; 
+}
+
+.profile-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 768px) {
+    .profile-flex-wrapper {
+        flex-direction: column;
+    }
+    
+    .form-container.profile-wide {
+        width: 100%;
+    }
+}

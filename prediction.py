@@ -1,0 +1,153 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sqlalchemy import create_engine
+import joblib
+
+# ================= DATABASE CONNECTION =================
+engine = create_engine('mysql+mysqlconnector://root:@localhost/dopas')
+
+# ================= LOAD DATA (Week 1–45) =================
+query = """
+SELECT
+    d.mukimId,
+    d.Week,
+    c.Temperature,
+    c.Rainfall,
+    c.Humidity,
+    d.dengueCases,
+    d.Year
+FROM denguerecords d
+JOIN climatedata c
+    ON d.mukimId = c.mukimId
+   AND d.Week = c.Week
+WHERE d.Week BETWEEN 1 AND 45
+ORDER BY d.mukimId, d.Week
+"""
+data = pd.read_sql(query, engine)
+
+# ================= DATA CLEANING =================
+data.dropna(inplace=True)
+data['Week'] = data['Week'].astype(int)
+data['dengueCases'] = data['dengueCases'].astype(int)
+data['Year'] = data['Year'].astype(int)  
+
+# ================= LAG FEATURE =================
+data['dengueCases_lag1'] = data.groupby('mukimId')['dengueCases'].shift(1)
+data = data.dropna()
+
+# ================= RISK THRESHOLDS (PERCENTILE-BASED) =================
+low_th = data['dengueCases'].quantile(0.25)   # 25th percentile
+high_th = data['dengueCases'].quantile(0.75)  # 75th percentile
+
+print(f"Low threshold (25th percentile): {low_th:.2f}")
+print(f"High threshold (75th percentile): {high_th:.2f}")
+
+
+# ================== CONFIG: CHOOSE TEST WEEKS ==================
+TEST_WEEK_START = 10   
+TEST_WEEK_END   = 25   
+
+# ================= TRAIN / TEST SPLIT =================
+test_data = data[
+    (data['Week'] >= TEST_WEEK_START) &
+    (data['Week'] <= TEST_WEEK_END)
+]
+
+train_data = data[
+    (data['Week'] < TEST_WEEK_START) |
+    (data['Week'] > TEST_WEEK_END)
+]
+
+print(f"Training weeks: < {TEST_WEEK_START} and > {TEST_WEEK_END}")
+print(f"Testing weeks: {TEST_WEEK_START}–{TEST_WEEK_END}")
+print("Training shape:", train_data.shape)
+print("Testing shape:", test_data.shape)
+
+# ================= FEATURES & TARGET =================
+feature_cols = ['Temperature', 'Rainfall', 'Humidity', 'dengueCases_lag1']
+
+X_train = train_data[feature_cols]
+y_train = train_data['dengueCases']
+
+X_test = test_data[feature_cols]
+y_test = test_data['dengueCases']
+
+# ================= MODEL TRAINING =================
+rf_model = RandomForestRegressor(
+    n_estimators=100,
+    random_state=30
+)
+rf_model.fit(X_train, y_train)
+
+# ================= PREDICTION =================
+preds = rf_model.predict(X_test)
+
+# ================= EVALUATION =================
+mse = mean_squared_error(y_test, preds)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, preds)
+
+
+print(f"MSE ({TEST_WEEK_START}-{TEST_WEEK_END}):", mse)
+print(f"RMSE ({TEST_WEEK_START}-{TEST_WEEK_END}):", rmse)
+print(f"R² ({TEST_WEEK_START}-{TEST_WEEK_END}):", r2)
+
+# ================= VISUALIZATION =================
+plt.figure(figsize=(10, 6))
+sns.set(style='whitegrid')
+
+plt.scatter(y_test, preds, color='blue', alpha=0.7, s=50, label='Data points')
+
+# Fit a linear regression model to the data points to get the "touching" line
+lr = LinearRegression()
+lr.fit(y_test.values.reshape(-1, 1), preds)
+slope = lr.coef_[0]
+intercept = lr.intercept_
+
+# Generate regression line values
+x_vals = np.linspace(min(y_test), max(y_test), 100)
+y_vals = slope * x_vals + intercept
+
+# Plot the best-fit regression line in green
+plt.plot(
+    x_vals, y_vals, color='red', linewidth=2,
+    label=f'Best fit: y={slope:.2f}x + {intercept:.2f}'
+)
+
+plt.xlabel("Actual Dengue Cases")
+plt.ylabel("Predicted Dengue Cases")
+plt.title(
+    f"Actual vs Predicted Dengue Cases "
+    f"(Year {test_data['Year'].iloc[0]}, Test Week {TEST_WEEK_START}–{TEST_WEEK_END})"
+)
+plt.legend()
+plt.grid(True)
+plt.show()
+
+def classify_risk(cases):
+    if cases >= high_th:
+        return "High"
+    elif cases >= low_th:
+        return "Medium"
+    else:
+        return "Low"
+
+# ================= SAVE MODEL (OPTIONAL) =================
+joblib.dump(rf_model, "dengue_model.pkl")
+
+# ================= OUTPUT TABLE =================
+output = test_data.copy()
+output['PredictedDengueCases'] = preds.round(0).astype(int)
+output['RiskLevel'] = output['PredictedDengueCases'].apply(classify_risk)
+
+print("\n=== Prediction Output ===")
+print(
+    output[['mukimId', 'Week', 'Year', 'dengueCases', 'PredictedDengueCases', 'RiskLevel']]
+    .sort_values(['mukimId','Week','Year'])
+    .to_string(index=False)
+)
